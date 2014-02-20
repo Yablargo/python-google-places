@@ -19,11 +19,14 @@ try:
 except ImportError:
     import simplejson as json
 import urllib
-import urllib2
+try:
+    import urllib.request as urllib2
+except:
+    import urllib2
 import warnings
 
-import lang
-import ranking
+from .lang import *
+from .ranking import *
 import types
 
 
@@ -95,7 +98,7 @@ def geocode_location(location, sensor=False):
     if geo_response['status'] == GooglePlaces.RESPONSE_STATUS_ZERO_RESULTS:
         error_detail = ('Lat/Lng for location \'%s\' can\'t be determined.' %
                         location)
-        raise GooglePlacesError, error_detail
+        raise GooglePlacesError(error_detail)
     return geo_response['results'][0]['geometry']['location']
 
 def _get_place_details(reference, api_key, sensor=False):
@@ -145,7 +148,7 @@ def _validate_response(url, response):
                                   GooglePlaces.RESPONSE_STATUS_ZERO_RESULTS]:
         error_detail = ('Request to URL %s failed with response code: %s' %
                         (url, response['status']))
-        raise GooglePlacesError, error_detail
+        raise GooglePlacesError(error_detail)
 
 
 class GooglePlacesError(Exception):
@@ -681,7 +684,7 @@ class Place(object):
         if self._details is None:
             error_detail = ('The attribute requested is only available after ' +
                     'an explicit call to get_details() is made.')
-            raise GooglePlacesAttributeError, error_detail
+            raise GooglePlacesAttributeError(error_detail)
 
 
 class Photo(object):
@@ -695,7 +698,7 @@ class Photo(object):
     def get(self, maxheight=None, maxwidth=None, sensor=False):
         """Fetch photo from API."""
         if not maxheight and not maxwidth:
-            raise GooglePlacesError, 'You must specify maxheight or maxwidth!'
+            raise GooglePlacesError('You must specify maxheight or maxwidth!')
 
         result = _get_place_photo(self.photo_reference,
                                   self._query_instance.api_key,
